@@ -1,0 +1,14 @@
+print("\n[Step 3] Applying Post-Training Dynamic Quantization (INT8 on Linear layers)...")
+    # Dynamic quantization converts weights to INT8 and activations dynamically on the fly
+    quantized_model = torch.quantization.quantize_dynamic(
+        pruned_model, 
+        qconfig_spec={nn.Linear}, 
+        dtype=torch.qint8
+    )
+    
+    quant_latency, quant_fps = benchmark_model(quantized_model, input_tensor)
+    quant_size = get_model_size_mb(quantized_model)
+    
+    print(f" -> Optimized Latency: {quant_latency:.2f} ms")
+    print(f" -> Optimized FPS:     {quant_fps:.2f}")
+    print(f" -> Optimized Size:    {quant_size:.2f} MB")
