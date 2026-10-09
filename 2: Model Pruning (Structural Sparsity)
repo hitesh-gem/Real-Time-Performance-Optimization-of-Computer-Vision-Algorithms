@@ -1,0 +1,16 @@
+print("\n[Step 2] Applying L1 Unstructured Weight Pruning (20% sparsity on Conv layers)...")
+    pruned_model = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.DEFAULT)
+    
+    for name, module in pruned_model.named_modules():
+        if isinstance(module, nn.Conv2d):
+            # Prune 20% of connections with smallest L1 norms
+            prune.l1_unstructured(module, name='weight', amount=0.2)
+            # Make pruning permanent by removing the parameter re-parameterization mask
+            prune.remove(module, 'weight')
+            
+    pruned_latency, pruned_fps = benchmark_model(pruned_model, input_tensor)
+    pruned_size = get_model_size_mb(pruned_model)
+    
+    print(f" -> Pruned Latency:   {pruned_latency:.2f} ms")
+    print(f" -> Pruned FPS:       {pruned_fps:.2f}")
+    print(f" -> Pruned Size:      {pruned_size:.2f} MB")
